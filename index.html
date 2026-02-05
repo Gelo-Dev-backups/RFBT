@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFBT Partnership Quiz Master</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --font-main: 'Inter', sans-serif;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: var(--font-main);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Minimalist Card Styling */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: all var(--transition-speed);
+        }
+
+        /* Dark Mode Overrides */
+        [data-bs-theme="dark"] body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        [data-bs-theme="dark"] .card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-option {
+            text-align: left;
+            transition: transform 0.1s;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        [data-bs-theme="dark"] .btn-option {
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-option:hover {
+            transform: translateX(5px);
+            background-color: #f8f9fa;
+        }
+
+        [data-bs-theme="dark"] .btn-option:hover {
+            background-color: #2c2c2c;
+        }
+
+        .btn-check:checked + .btn-option {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+
+        /* Clock & Date Styling */
+        .datetime-display {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .progress {
+            height: 6px;
+            border-radius: 10px;
+        }
+
+        /* Fade Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg border-bottom sticky-top" style="backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-book-open me-2 text-primary"></i>RFBT Quiz
+            </a>
+            
+            <div class="d-flex align-items-center ms-auto gap-3">
+                <div class="text-end d-none d-md-block datetime-display">
+                    <div id="clock-time">00:00:00</div>
+                    <div id="clock-date" style="font-size: 0.75rem;">Loading...</div>
+                </div>
+
+                <button class="btn btn-outline-secondary btn-sm rounded-circle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5 flex-grow-1 d-flex flex-column justify-content-center">
+        
+        <div id="setup-section" class="row justify-content-center fade-in">
+            <div class="col-md-8 col-lg-6">
+                <div class="card p-4 p-md-5">
+                    <h2 class="fw-bold mb-4 text-center">Quiz Configuration</h2>
+                    
+                    <form id="quiz-config-form">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Question Type</label>
+                            <select class="form-select form-select-lg" id="quizType">
+                                <option value="mixed" selected>Mixed (All Types)</option>
+                                <option value="multiple_choice">Multiple Choice</option>
+                                <option value="situational">Situational</option>
+                                <option value="identification">Identification</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Number of Items</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="qCount" id="c10" value="10" checked>
+                                <label class="btn btn-outline-primary" for="c10">10</label>
+
+                                <input type="radio" class="btn-check" name="qCount" id="c20" value="20">
+                                <label class="btn btn-outline-primary" for="c20">20</label>
+
+                                <input type="radio" class="btn-check" name="qCount" id="c30" value="30">
+                                <label class="btn btn-outline-primary" for="c30">30</label>
+                                
+                                <input type="radio" class="btn-check" name="qCount" id="c40" value="40">
+                                <label class="btn btn-outline-primary" for="c40">40</label>
+
+                                <input type="radio" class="btn-check" name="qCount" id="c50" value="50">
+                                <label class="btn btn-outline-primary" for="c50">50</label>
+
+                                <input type="radio" class="btn-check" name="qCount" id="c60" value="60">
+                                <label class="btn btn-outline-primary" for="c60">60</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Article Range (1767 - 1809)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">From Art.</span>
+                                <input type="number" class="form-control" id="startArticle" value="1767" min="1767" max="1809">
+                                <span class="input-group-text">To Art.</span>
+                                <input type="number" class="form-control" id="endArticle" value="1809" min="1767" max="1809">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm">
+                            Start Quiz <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </form>
+                    <div id="error-msg" class="text-danger mt-3 text-center small hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-section" class="row justify-content-center hidden">
+            <div class="col-md-8">
+                <div class="mb-3 d-flex justify-content-between align-items-end">
+                    <span class="badge bg-primary rounded-pill px-3">Q <span id="current-q-num">1</span>/<span id="total-q-num">10</span></span>
+                    <span class="small text-muted" id="article-badge">Art. 1767</span>
+                </div>
+                <div class="progress mb-4 bg-secondary-subtle">
+                    <div class="progress-bar bg-primary" id="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+
+                <div class="card p-4 p-md-5 mb-4 fade-in">
+                    <div class="mb-2">
+                        <span class="badge bg-secondary mb-2 text-uppercase" style="font-size: 0.65rem;" id="q-type-badge">Multiple Choice</span>
+                    </div>
+                    <h4 class="fw-bold mb-4" id="question-text">Question goes here...</h4>
+                    
+                    <div id="options-container" class="d-flex flex-column gap-2">
+                        </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-secondary" onclick="quitQuiz()">Quit</button>
+                    <button class="btn btn-primary px-4" id="next-btn" onclick="nextQuestion()">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-section" class="row justify-content-center hidden">
+            <div class="col-md-6 text-center fade-in">
+                <div class="card p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-trophy text-warning fa-4x mb-3"></i>
+                        <h2 class="fw-bold">Quiz Completed!</h2>
+                        <p class="text-muted">Here is how you performed</p>
+                    </div>
+
+                    <div class="display-1 fw-bold text-primary mb-3">
+                        <span id="final-score">0</span><span class="fs-4 text-muted"> / <span id="final-total">0</span></span>
+                    </div>
+
+                    <div class="alert alert-light border mb-4" id="score-message">
+                        </div>
+
+                    <button class="btn btn-primary btn-lg w-100" onclick="resetApp()">
+                        <i class="fas fa-redo me-2"></i> Play Again
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-4 text-muted small">
+        &copy; 2026 BSIT RFBT Reviewer System
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- 1. DATA ---
+        // PASTE THE FULL JSON ARRAY HERE. I am putting a variable to hold it.
+const quizData = [
+  {
+    "id": 1,
+    "type": "multiple_choice",
+    "article": 1767,
+    "question": "Which of the following is NOT a requisite for a valid contract of partnership?",
+    "options": [
+      "Mutual contribution to a common fund",
+      "Lawful object or purpose",
+      "Intention to divide profits",
+      "Capital of at least P3,000"
+    ],
+    "answer": "Capital of at least P3,000"
+  },
+  {
+    "id": 2,
+    "type": "multiple_choice",
+    "article": 1767,
+    "question": "A partnership formed for the exercise of a profession (like a law firm) is valid. Which Article recognizes this?",
+    "options": [
+      "Article 1767",
+      "Article 1770",
+      "Article 1780",
+      "Article 1800"
+    ],
+    "answer": "Article 1767"
+  },
+  {
+    "id": 3,
+    "type": "multiple_choice",
+    "article": 1768,
+    "question": "Does a partnership need to comply with SEC registration to have a juridical personality?",
+    "options": [
+      "Yes, always.",
+      "No, it has personality even without registration.",
+      "Yes, if the capital exceeds P3,000.",
+      "No, unless it is a limited partnership."
+    ],
+    "answer": "No, it has personality even without registration."
+  },
+  {
+    "id": 4,
+    "type": "multiple_choice",
+    "article": 1769,
+    "question": "Which of the following is prima facie evidence that a person is a partner in a business?",
+    "options": [
+      "Sharing of gross returns",
+      "Co-ownership of property",
+      "Sharing of profits",
+      "Receiving wages"
+    ],
+    "answer": "Sharing of profits"
+  },
+  {
+    "id": 5,
+    "type": "multiple_choice",
+    "article": 1770,
+    "question": "If a partnership is dissolved because its purpose was illegal (e.g., gambling), what happens to the profits?",
+    "options": [
+      "Returned to partners",
+      "Confiscated by the State",
+      "Donated to charity",
+      "Kept by the managing partner"
+    ],
+    "answer": "Confiscated by the State"
+  },
+  {
+    "id": 6,
+    "type": "multiple_choice",
+    "article": 1771,
+    "question": "A partnership agreement can be oral, EXCEPT when:",
+    "options": [
+      "Capital is more than P3,000",
+      "Immovable property is contributed",
+      "It is a general partnership",
+      "It is for a fixed term"
+    ],
+    "answer": "Immovable property is contributed"
+  },
+  {
+    "id": 7,
+    "type": "multiple_choice",
+    "article": 1773,
+    "question": "If real property is contributed but no inventory is attached to the public instrument, the partnership contract is:",
+    "options": [
+      "Voidable",
+      "Rescissible",
+      "Void",
+      "Unenforceable"
+    ],
+    "answer": "Void"
+  },
+  {
+    "id": 8,
+    "type": "multiple_choice",
+    "article": 1776,
+    "question": "As to its object, a partnership is either:",
+    "options": [
+      "General or Limited",
+      "Universal or Particular",
+      "De Jure or De Facto",
+      "Fixed Term or At Will"
+    ],
+    "answer": "Universal or Particular"
+  },
+  {
+    "id": 9,
+    "type": "multiple_choice",
+    "article": 1777,
+    "question": "A Universal Partnership may refer to:",
+    "options": [
+      "All present property or all profits",
+      "All future property only",
+      "Only movable property",
+      "Only immovable property"
+    ],
+    "answer": "All present property or all profits"
+  },
+  {
+    "id": 10,
+    "type": "multiple_choice",
+    "article": 1785,
+    "question": "A partnership that continues business after its fixed term has expired is called:",
+    "options": [
+      "Partnership by Estoppel",
+      "Partnership at Will",
+      "Limited Partnership",
+      "De Facto Partnership"
+    ],
+    "answer": "Partnership at Will"
+  },
+  {
+    "id": 11,
+    "type": "multiple_choice",
+    "article": 1786,
+    "question": "When must a partner deliver his contribution to the partnership?",
+    "options": [
+      "Upon demand",
+      "Within 30 days",
+      "At the start of the partnership execution",
+      "When the business registers"
+    ],
+    "answer": "At the start of the partnership execution"
+  },
+  {
+    "id": 12,
+    "type": "multiple_choice",
+    "article": 1788,
+    "question": "A partner who fails to contribute promised money on time becomes a debtor for:",
+    "options": [
+      "Interest and damages",
+      "The principal only",
+      "Penalty fees only",
+      "Nothing"
+    ],
+    "answer": "Interest and damages"
+  },
+  {
+    "id": 13,
+    "type": "multiple_choice",
+    "article": 1789,
+    "question": "Which partner is prohibited from engaging in ANY business for himself?",
+    "options": [
+      "Capitalist Partner",
+      "Industrial Partner",
+      "Managing Partner",
+      "Silent Partner"
+    ],
+    "answer": "Industrial Partner"
+  },
+  {
+    "id": 14,
+    "type": "multiple_choice",
+    "article": 1791,
+    "question": "In case of imminent loss, a capitalist partner who refuses to contribute additional share must:",
+    "options": [
+      "Be imprisoned",
+      "Sell his interest to the other partners",
+      "Pay double the contribution",
+      "Resign as manager"
+    ],
+    "answer": "Sell his interest to the other partners"
+  },
+  {
+    "id": 15,
+    "type": "multiple_choice",
+    "article": 1794,
+    "question": "Every partner is responsible to the partnership for damages suffered by it through his:",
+    "options": [
+      "Luck",
+      "Fault",
+      "Absence",
+      "Illness"
+    ],
+    "answer": "Fault"
+  },
+  {
+    "id": 16,
+    "type": "multiple_choice",
+    "article": 1796,
+    "question": "The partnership is responsible to every partner for amounts he may have disbursed on behalf of the partnership. This is called:",
+    "options": [
+      "Compensation",
+      "Reimbursement",
+      "Remuneration",
+      "Dividends"
+    ],
+    "answer": "Reimbursement"
+  },
+  {
+    "id": 17,
+    "type": "multiple_choice",
+    "article": 1797,
+    "question": "If there is no agreement on profit sharing, how is it distributed?",
+    "options": [
+      "Equally",
+      "In proportion to capital contribution",
+      "By seniority",
+      "Decided by the manager"
+    ],
+    "answer": "In proportion to capital contribution"
+  },
+  {
+    "id": 18,
+    "type": "multiple_choice",
+    "article": 1799,
+    "question": "Is a stipulation excluding a partner from any share in profits valid?",
+    "options": [
+      "Yes",
+      "No, it is void",
+      "Yes, if in writing",
+      "Yes, for limited partners"
+    ],
+    "answer": "No, it is void"
+  },
+  {
+    "id": 19,
+    "type": "multiple_choice",
+    "article": 1800,
+    "question": "A managing partner appointed in the Articles of Partnership can only be removed for:",
+    "options": [
+      "Loss of confidence",
+      "Just or lawful cause",
+      "Majority vote",
+      "Any reason"
+    ],
+    "answer": "Just or lawful cause"
+  },
+  {
+    "id": 20,
+    "type": "multiple_choice",
+    "article": 1801,
+    "question": "If two managers disagree, whose decision prevails?",
+    "options": [
+      "The older one",
+      "The one with more capital",
+      "The majority of the managers",
+      "The court"
+    ],
+    "answer": "The majority of the managers"
+  },
+  {
+    "id": 21,
+    "type": "multiple_choice",
+    "article": 1803,
+    "question": "If no management rule is agreed upon, who are agents of the partnership?",
+    "options": [
+      "Only the capitalist partners",
+      "All partners",
+      "Only the industrial partners",
+      "No one"
+    ],
+    "answer": "All partners"
+  },
+  {
+    "id": 22,
+    "type": "multiple_choice",
+    "article": 1804,
+    "question": "Can a partner associate a third person with his share?",
+    "options": [
+      "Yes, always",
+      "No, never",
+      "Yes, but the associate does not become a partner without consent",
+      "Yes, and the associate automatically becomes a partner"
+    ],
+    "answer": "Yes, but the associate does not become a partner without consent"
+  },
+  {
+    "id": 23,
+    "type": "multiple_choice",
+    "article": 1805,
+    "question": "Partnership books shall be kept at:",
+    "options": [
+      "The SEC office",
+      "The principal place of business",
+      "The manager's home",
+      "The bank"
+    ],
+    "answer": "The principal place of business"
+  },
+  {
+    "id": 24,
+    "type": "multiple_choice",
+    "article": 1806,
+    "question": "Partners must render on demand true and full information to:",
+    "options": [
+      "The public",
+      "Any partner or legal representative",
+      "The police",
+      "Competitors"
+    ],
+    "answer": "Any partner or legal representative"
+  },
+  {
+    "id": 25,
+    "type": "multiple_choice",
+    "article": 1807,
+    "question": "A partner who derives profit from a partnership transaction without consent holds that profit as:",
+    "options": [
+      "Owner",
+      "Trustee",
+      "Debtor",
+      "Creditor"
+    ],
+    "answer": "Trustee"
+  },
+  {
+    "id": 26,
+    "type": "multiple_choice",
+    "article": 1808,
+    "question": "Can a capitalist partner engage in a business similar to the partnership?",
+    "options": [
+      "Yes, always",
+      "No, unless stipulated otherwise",
+      "Yes, if he pays tax",
+      "No, never"
+    ],
+    "answer": "No, unless stipulated otherwise"
+  },
+  {
+    "id": 27,
+    "type": "multiple_choice",
+    "article": 1809,
+    "question": "When can a partner demand a formal account of partnership affairs?",
+    "options": [
+      "Every day",
+      "Only upon dissolution",
+      "If wrongfully excluded from business",
+      "When the moon is full"
+    ],
+    "answer": "If wrongfully excluded from business"
+  },
+  {
+    "id": 28,
+    "type": "multiple_choice",
+    "article": 1772,
+    "question": "Failure to register a partnership with P3,000 capital affects:",
+    "options": [
+      "Its juridical personality",
+      "Its validity",
+      "Liability to third parties",
+      "Nothing"
+    ],
+    "answer": "Liability to third parties"
+  },
+  {
+    "id": 29,
+    "type": "multiple_choice",
+    "article": 1784,
+    "question": "A partnership begins from:",
+    "options": [
+      "The moment of execution of the contract",
+      "Registration with SEC",
+      "The first sale",
+      "The first meeting"
+    ],
+    "answer": "The moment of execution of the contract"
+  },
+  {
+    "id": 30,
+    "type": "multiple_choice",
+    "article": 1793,
+    "question": "If a partner receives his share of a partnership credit and the debtor becomes insolvent, must he bring his share to the partnership capital?",
+    "options": [
+      "No, it's his luck",
+      "Yes, even if he gave a receipt for his share only",
+      "Only if the amount is large",
+      "No, finders keepers"
+    ],
+    "answer": "Yes, even if he gave a receipt for his share only"
+  },
+  {
+    "id": 31,
+    "type": "situational",
+    "article": 1767,
+    "question": "A and B agree to contribute money to buy a lottery ticket, promising to divide the prize if they win. Is this a partnership?",
+    "options": [
+      "Yes, because there is contribution and intent to share profits.",
+      "No, because it is not a business or trade.",
+      "Yes, it is a particular partnership.",
+      "No, because gambling is illegal."
+    ],
+    "answer": "Yes, because there is contribution and intent to share profits."
+  },
+  {
+    "id": 32,
+    "type": "situational",
+    "article": 1769,
+    "question": "X receives 10% of the net income of a bakery as payment for a loan he gave the owner. Is X a partner?",
+    "options": [
+      "Yes, sharing profits is prima facie evidence.",
+      "No, because the money is received as payment for a debt.",
+      "Yes, because he has financial interest.",
+      "Maybe, if he attends meetings."
+    ],
+    "answer": "No, because the money is received as payment for a debt."
+  },
+  {
+    "id": 33,
+    "type": "situational",
+    "article": 1773,
+    "question": "Partners A and B contribute land to their partnership. They sign a private document but do not attach an inventory. Is the partnership valid?",
+    "options": [
+      "Yes, as between them.",
+      "No, the contract is void entirely.",
+      "Yes, but they cannot sell the land.",
+      "No, unless they pay a fine."
+    ],
+    "answer": "No, the contract is void entirely."
+  },
+  {
+    "id": 34,
+    "type": "situational",
+    "article": 1782,
+    "question": "Husband and wife want to form a Universal Partnership of Profits. Is this allowed?",
+    "options": [
+      "No, spouses cannot form universal partnerships.",
+      "Yes, spouses can form a universal partnership of profits.",
+      "No, only particular partnerships are allowed.",
+      "Yes, if they have separate property regimes."
+    ],
+    "answer": "No, spouses cannot form universal partnerships."
+  },
+  {
+    "id": 35,
+    "type": "situational",
+    "article": 1785,
+    "question": "A partnership for a fixed term of 5 years expires. The partners continue business without a new contract. What kind of partnership is it now?",
+    "options": [
+      "Partnership by Estoppel",
+      "De Facto Partnership",
+      "Partnership at Will",
+      "Illegal Partnership"
+    ],
+    "answer": "Partnership at Will"
+  },
+  {
+    "id": 36,
+    "type": "situational",
+    "article": 1786,
+    "question": "Partner A promised to contribute a car on Jan 1. He delivered it on Jan 15. The car's value dropped by P5,000 during that delay. What is A liable for?",
+    "options": [
+      "Nothing, he delivered it.",
+      "Interest and damages for the delay.",
+      "He must buy a new car.",
+      "He is expelled."
+    ],
+    "answer": "Interest and damages for the delay."
+  },
+  {
+    "id": 37,
+    "type": "situational",
+    "article": 1789,
+    "question": "A is an industrial partner in a printing business. He opens a coffee shop on weekends. The partners did not give permission. Can they expel him?",
+    "options": [
+      "No, coffee is different from printing.",
+      "Yes, industrial partners cannot engage in ANY business for themselves.",
+      "No, because it's only on weekends.",
+      "Yes, but they must pay him back."
+    ],
+    "answer": "Yes, industrial partners cannot engage in ANY business for themselves."
+  },
+  {
+    "id": 38,
+    "type": "situational",
+    "article": 1791,
+    "question": "The partnership is losing money fast. The partners vote to contribute P50,000 each to save it. Partner B (Capitalist) refuses because he wants to save his own money. What happens?",
+    "options": [
+      "He can keep his money.",
+      "He must sell his interest to the others.",
+      "The partnership is dissolved.",
+      "He becomes a limited partner."
+    ],
+    "answer": "He must sell his interest to the others."
+  },
+  {
+    "id": 39,
+    "type": "situational",
+    "article": 1792,
+    "question": "Partner M (Manager) collects P5,000 from Debtor D. D owes the Partnership P10,000 and M P10,000. M gives a receipt for his own credit. How is the P5,000 applied?",
+    "options": [
+      "All to M.",
+      "All to Partnership.",
+      "Proportionately (P2,500 each).",
+      "Whatever D decides."
+    ],
+    "answer": "Proportionately (P2,500 each)."
+  },
+  {
+    "id": 40,
+    "type": "situational",
+    "article": 1794,
+    "question": "Partner X caused P10,000 damage to the firm by negligence. But last year, he made P50,000 profit for the firm. Can he say 'Keep the P10,000 from my past profits'?",
+    "options": [
+      "Yes, it's fair.",
+      "No, damages cannot be compensated by industry profits.",
+      "Yes, if the manager agrees.",
+      "No, unless the court says so."
+    ],
+    "answer": "No, damages cannot be compensated by industry profits."
+  },
+  {
+    "id": 41,
+    "type": "situational",
+    "article": 1795,
+    "question": "Partner G contributes the USE of his van. A typhoon destroys the van. Who loses the van?",
+    "options": [
+      "The Partnership.",
+      "Partner G.",
+      "All partners equally.",
+      "The insurance only."
+    ],
+    "answer": "Partner G."
+  },
+  {
+    "id": 42,
+    "type": "situational",
+    "article": 1795,
+    "question": "Partner H contributes 100 sacks of corn (fungible). They are destroyed by fire. Who bears the loss?",
+    "options": [
+      "Partner H.",
+      "The Partnership.",
+      "The customer.",
+      "No one."
+    ],
+    "answer": "The Partnership."
+  },
+  {
+    "id": 43,
+    "type": "situational",
+    "article": 1797,
+    "question": "A (Capital P100k) and B (Capital P50k) have no profit agreement. They earn P30k. How much does B get?",
+    "options": [
+      "P15,000",
+      "P10,000",
+      "P20,000",
+      "P5,000"
+    ],
+    "answer": "P10,000"
+  },
+  {
+    "id": 44,
+    "type": "situational",
+    "article": 1797,
+    "question": "C is an industrial partner. The partnership loses P100,000. How much does C pay?",
+    "options": [
+      "Equal share",
+      "Proportionate share",
+      "Nothing",
+      "Whatever he can afford"
+    ],
+    "answer": "Nothing"
+  },
+  {
+    "id": 45,
+    "type": "situational",
+    "article": 1800,
+    "question": "M was appointed manager in the Articles of Partnership. Partners A and B don't like his decisions and want to remove him by majority vote. Can they?",
+    "options": [
+      "Yes, majority rules.",
+      "No, his power is irrevocable without just cause.",
+      "Yes, if they pay him.",
+      "No, unless M agrees."
+    ],
+    "answer": "No, his power is irrevocable without just cause."
+  },
+  {
+    "id": 46,
+    "type": "situational",
+    "article": 1801,
+    "question": "Managers A and B have equal power. A wants to buy a truck. B opposes. Who wins?",
+    "options": [
+      "A, because he had the idea.",
+      "B, because he objected.",
+      "Majority of managers (if more exist) or partners with controlling interest.",
+      "The court."
+    ],
+    "answer": "Majority of managers (if more exist) or partners with controlling interest."
+  },
+  {
+    "id": 47,
+    "type": "situational",
+    "article": 1804,
+    "question": "Partner P asks his friend F to help him with his partnership tasks and shares his own profits with F. Do the other partners need to accept F as a partner?",
+    "options": [
+      "Yes, F is working for the firm.",
+      "No, F is only a sub-partner of P.",
+      "Yes, if F invests money.",
+      "No, unless F signs the contract."
+    ],
+    "answer": "No, F is only a sub-partner of P."
+  },
+  {
+    "id": 48,
+    "type": "situational",
+    "article": 1807,
+    "question": "Partner K uses partnership funds to buy a lot in his own name and sells it for a profit. Who owns the profit?",
+    "options": [
+      "Partner K.",
+      "The Partnership.",
+      "Split 50/50.",
+      "The government."
+    ],
+    "answer": "The Partnership."
+  },
+  {
+    "id": 49,
+    "type": "situational",
+    "article": 1808,
+    "question": "The partnership sells shoes. Partner C (Capitalist) opens a shoe store next door. Is this allowed?",
+    "options": [
+      "Yes, it's a free country.",
+      "No, capitalist partners cannot engage in the same business.",
+      "Yes, if he is an industrial partner.",
+      "No, unless he pays tax."
+    ],
+    "answer": "No, capitalist partners cannot engage in the same business."
+  },
+  {
+    "id": 50,
+    "type": "situational",
+    "article": 1809,
+    "question": "Partner J is kicked out of the office and not allowed to see the books. Can he demand a formal account?",
+    "options": [
+      "No, only at the end of the year.",
+      "Yes, because he is wrongfully excluded.",
+      "No, he must resign first.",
+      "Yes, if he pays a fee."
+    ],
+    "answer": "Yes, because he is wrongfully excluded."
+  },
+  {
+    "id": 51,
+    "type": "situational",
+    "article": 1788,
+    "question": "Partner A took P10,000 from the partnership vault for a personal trip. When does his liability for interest begin?",
+    "options": [
+      "When the partners find out.",
+      "When he returns.",
+      "From the time he converted the amount to his own use.",
+      "At the end of the year."
+    ],
+    "answer": "From the time he converted the amount to his own use."
+  },
+  {
+    "id": 52,
+    "type": "situational",
+    "article": 1803,
+    "question": "There is no agreement on management. Partner A buys supplies. Partner B refuses to pay. Is the partnership bound?",
+    "options": [
+      "No, B did not agree.",
+      "Yes, every partner is an agent in the absence of agreement.",
+      "No, A needs a power of attorney.",
+      "Yes, but A pays half."
+    ],
+    "answer": "Yes, every partner is an agent in the absence of agreement."
+  },
+  {
+    "id": 53,
+    "type": "situational",
+    "article": 1793,
+    "question": "A, B, C are partners. D owes the firm P30k. A collects his P10k share. D goes bankrupt. Can B and C ask A to share his P10k?",
+    "options": [
+      "No, A was smart to collect early.",
+      "Yes, Art 1793 requires A to bring it to the partnership capital.",
+      "No, it's D's fault.",
+      "Yes, but only 50%."
+    ],
+    "answer": "Yes, Art 1793 requires A to bring it to the partnership capital."
+  },
+  {
+    "id": 54,
+    "type": "situational",
+    "article": 1779,
+    "question": "In a universal partnership of all present property, Partner A inherits a house later. Does the house belong to the partnership?",
+    "options": [
+      "Yes, everything belongs to the partnership.",
+      "No, future inheritance is not included.",
+      "Yes, if A wants to.",
+      "No, but the partnership gets the house title."
+    ],
+    "answer": "No, future inheritance is not included."
+  },
+  {
+    "id": 55,
+    "type": "situational",
+    "article": 1779,
+    "question": "Same scenario: A inherits a house. He rents it out. Does the RENT money belong to the partnership?",
+    "options": [
+      "No.",
+      "Yes, fruits of future property are included if stipulated.",
+      "Yes, always.",
+      "No, never."
+    ],
+    "answer": "Yes, fruits of future property are included if stipulated."
+  },
+  {
+    "id": 56,
+    "type": "situational",
+    "article": 1802,
+    "question": "The contract says 'No one acts without consent of all.' Partner A sees the warehouse is on fire and hires a fire truck without asking B and C. Is this valid?",
+    "options": [
+      "No, he violated the contract.",
+      "Yes, because of imminent danger of grave injury.",
+      "No, he must call them first.",
+      "Yes, if it's cheap."
+    ],
+    "answer": "Yes, because of imminent danger of grave injury."
+  },
+  {
+    "id": 57,
+    "type": "situational",
+    "article": 1799,
+    "question": "The contract states 'Partner A gets 100% of profits.' Is the partnership void?",
+    "options": [
+      "Yes, the whole contract is void.",
+      "No, only the stipulation is void.",
+      "Yes, unless A did all the work.",
+      "No, it is valid."
+    ],
+    "answer": "No, only the stipulation is void."
+  },
+  {
+    "id": 58,
+    "type": "situational",
+    "article": 1768,
+    "question": "A, B, C form a partnership but hide their articles and keep it secret. They contract in their own names. Do they have juridical personality?",
+    "options": [
+      "Yes.",
+      "No, they are governed by co-ownership.",
+      "Yes, as a de facto corporation.",
+      "Maybe."
+    ],
+    "answer": "No, they are governed by co-ownership."
+  },
+  {
+    "id": 59,
+    "type": "situational",
+    "article": 1786,
+    "question": "Partner A contributes a house. A stranger, Mr. X, wins a court case claiming he owns the house (eviction). Is Partner A liable?",
+    "options": [
+      "No, it's not his fault.",
+      "Yes, a partner is bound for warranty in case of eviction.",
+      "No, the partnership takes the risk.",
+      "Yes, but only for half value."
+    ],
+    "answer": "Yes, a partner is bound for warranty in case of eviction."
+  },
+  {
+    "id": 60,
+    "type": "situational",
+    "article": 1805,
+    "question": "Partner B wants to photocopy the financial records at 2 PM on a Tuesday. The manager refuses, saying 'Trust me'. Can B insist?",
+    "options": [
+      "No, trust is key.",
+      "Yes, partners have the right to inspect at reasonable hours.",
+      "No, he needs a court order.",
+      "Yes, but he must pay the manager."
+    ],
+    "answer": "Yes, partners have the right to inspect at reasonable hours."
+  },
+  {
+    "id": 61,
+    "type": "identification",
+    "article": 1767,
+    "question": "What is the term for a contract where two or more persons bind themselves to contribute money, property, or industry to a common fund, with the intention of dividing the profits among themselves?",
+    "answer": "Partnership"
+  },
+  {
+    "id": 62,
+    "type": "identification",
+    "article": 1768,
+    "question": "What does a partnership possess that is separate and distinct from that of each of the partners?",
+    "answer": "Juridical Personality"
+  },
+  {
+    "id": 63,
+    "type": "identification",
+    "article": 1776,
+    "question": "What type of partnership is one where all the partners are liable pro rata with all their property and after all the partnership assets have been exhausted?",
+    "answer": "General Partnership"
+  },
+  {
+    "id": 64,
+    "type": "identification",
+    "article": 1776,
+    "question": "What type of partnership has at least one general partner and at least one limited partner?",
+    "answer": "Limited Partnership"
+  },
+  {
+    "id": 65,
+    "type": "identification",
+    "article": 1785,
+    "question": "What do you call a partnership that is formed for a specific piece of work or business project?",
+    "answer": "Particular Partnership"
+  },
+  {
+    "id": 66,
+    "type": "identification",
+    "article": 1789,
+    "question": "Which type of partner contributes only his skill, labor, or industry?",
+    "answer": "Industrial Partner"
+  },
+  {
+    "id": 67,
+    "type": "identification",
+    "article": 1789,
+    "question": "Which type of partner contributes money or property to the common fund?",
+    "answer": "Capitalist Partner"
+  },
+  {
+    "id": 68,
+    "type": "identification",
+    "article": 1796,
+    "question": "What is the term for the obligation of the partnership to answer for the amounts a partner disbursed on its behalf?",
+    "answer": "Reimbursement"
+  },
+  {
+    "id": 69,
+    "type": "identification",
+    "article": 1800,
+    "question": "If a manager is appointed in the Articles of Partnership, his power is ____________.",
+    "answer": "Irrevocable"
+  },
+  {
+    "id": 70,
+    "type": "identification",
+    "article": 1799,
+    "question": "What is the Latin term (or general term) for a void stipulation which excludes a partner from sharing in profits or losses?",
+    "answer": "Pactum Leonina"
+  },
+  {
+    "id": 71,
+    "type": "identification",
+    "article": 1767,
+    "question": "Partnership is a ____________ contract because it is perfected by mere consent.",
+    "answer": "Consensual"
+  },
+  {
+    "id": 72,
+    "type": "identification",
+    "article": 1767,
+    "question": "Partnership is a ____________ contract because the parties contribute to a common fund.",
+    "answer": "Onerous"
+  },
+  {
+    "id": 73,
+    "type": "identification",
+    "article": 1772,
+    "question": "With which government agency must a partnership with P3,000 or more capital register?",
+    "answer": "SEC"
+  },
+  {
+    "id": 74,
+    "type": "identification",
+    "article": 1803,
+    "question": "In the absence of a designated manager, every partner is considered an ____________ of the partnership.",
+    "answer": "Agent"
+  },
+  {
+    "id": 75,
+    "type": "identification",
+    "article": 1767,
+    "question": "This principle means that a partner has the right to choose who he wants to be partners with (Choice of Person).",
+    "answer": "Delectus Personae"
+  },
+  {
+    "id": 76,
+    "type": "identification",
+    "article": 1773,
+    "question": "If immovable property is contributed, what must be made, signed, and attached to the public instrument for the contract to be valid?",
+    "answer": "Inventory"
+  },
+  {
+    "id": 77,
+    "type": "identification",
+    "article": 1804,
+    "question": "What do you call a person associated by a partner in his share?",
+    "answer": "Sub-partner"
+  },
+  {
+    "id": 78,
+    "type": "identification",
+    "article": 1795,
+    "question": "Who bears the risk of loss of fungible things contributed to the partnership?",
+    "answer": "Partnership"
+  },
+  {
+    "id": 79,
+    "type": "identification",
+    "article": 1795,
+    "question": "Who bears the risk of loss of specific, non-fungible things contributed to the partnership where only the *use* is contributed?",
+    "answer": "Partner"
+  },
+  {
+    "id": 80,
+    "type": "identification",
+    "article": 1807,
+    "question": "A partner who makes a secret profit holds it as a ____________ for the partnership.",
+    "answer": "Trustee"
+  },
+  {
+    "id": 81,
+    "type": "identification",
+    "article": 1786,
+    "question": "A partner is liable for ____________ if he is evicted from the specific thing he contributed.",
+    "answer": "Warranty"
+  },
+  {
+    "id": 82,
+    "type": "identification",
+    "article": 1788,
+    "question": "A partner who takes money from the partnership chest for his own use is liable for interest starting from the time of ____________.",
+    "answer": "Conversion"
+  },
+  {
+    "id": 83,
+    "type": "identification",
+    "article": 1791,
+    "question": "An industrial partner is EXEMPT from the requirement to contribute additional capital in case of ____________.",
+    "answer": "Imminent Loss"
+  },
+  {
+    "id": 84,
+    "type": "identification",
+    "article": 1792,
+    "question": "If a managing partner collects a sum from a debtor who owes both him and the partnership, and he issues a partnership receipt, the payment applies to ____________.",
+    "answer": "Partnership Credit"
+  },
+  {
+    "id": 85,
+    "type": "identification",
+    "article": 1769,
+    "question": "Receipt of a share of the profits is ____________ evidence that a person is a partner.",
+    "answer": "Prima Facie"
+  },
+  {
+    "id": 86,
+    "type": "identification",
+    "article": 1780,
+    "question": "A universal partnership of profits comprises all that the partners may acquire by their ____________.",
+    "answer": "Industry"
+  },
+  {
+    "id": 87,
+    "type": "identification",
+    "article": 1779,
+    "question": "In a universal partnership of all present property, property acquired by inheritance is ____________ (Included/Excluded).",
+    "answer": "Excluded"
+  },
+  {
+    "id": 88,
+    "type": "identification",
+    "article": 1805,
+    "question": "Partners have the right to ____________ and copy partnership books.",
+    "answer": "Inspect"
+  },
+  {
+    "id": 89,
+    "type": "identification",
+    "article": 1808,
+    "question": "A capitalist partner cannot engage in a business that is of the same ____________ as the partnership business.",
+    "answer": "Kind"
+  },
+  {
+    "id": 90,
+    "type": "identification",
+    "article": 1809,
+    "question": "A partner may demand a formal ____________ if he is wrongfully excluded from the partnership business.",
+    "answer": "Account"
+  }
+];
+
+        // Ensure we handle the full dataset logic assuming user pasted it
+        let activeQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userSelectedAnswer = null;
+
+        // --- 2. THEME & CLOCK ---
+        
+        // Clock Logic
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('clock-date').textContent = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Dark Mode Logic
+        const toggleBtn = document.getElementById('themeToggle');
+        const htmlEl = document.documentElement;
+        const icon = toggleBtn.querySelector('i');
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlEl.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlEl.setAttribute('data-bs-theme', newTheme);
+            htmlEl.classList.toggle('bg-light'); // Toggle bg-light class for body
+            
+            // Update Icon
+            icon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+            
+            // Store preference (optional)
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // --- 3. QUIZ LOGIC ---
+
+        document.getElementById('quiz-config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            startQuiz();
+        });
+
+        function startQuiz() {
+            // Get inputs
+            const type = document.getElementById('quizType').value;
+            const count = parseInt(document.querySelector('input[name="qCount"]:checked').value);
+            const startArt = parseInt(document.getElementById('startArticle').value);
+            const endArt = parseInt(document.getElementById('endArticle').value);
+
+            // Filter Data
+            let filtered = quizData.filter(item => {
+                // Check Type
+                let typeMatch = (type === 'mixed') ? true : (item.type === type);
+                // Check Article Range (if item has article data)
+                let artMatch = true;
+                if (item.article) {
+                    artMatch = (item.article >= startArt && item.article <= endArt);
+                }
+                return typeMatch && artMatch;
+            });
+
+            // Validation
+            const errorMsg = document.getElementById('error-msg');
+            if (filtered.length === 0) {
+                errorMsg.textContent = "No questions found for this criteria. Try a wider Article range.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            if (filtered.length < count) {
+                // If requested 60 but only 10 exist, just give the 10.
+                // Or show error. Let's just proceed with max available.
+                // errorMsg.textContent = `Only ${filtered.length} questions available for this range.`;
+            }
+
+            // Shuffle and Slice
+            activeQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, count);
+
+            // Reset State
+            currentQuestionIndex = 0;
+            score = 0;
+            errorMsg.classList.add('hidden');
+
+            // UI Switch
+            document.getElementById('setup-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.remove('hidden');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            const total = activeQuestions.length;
+
+            // Update Header Info
+            document.getElementById('current-q-num').textContent = currentQuestionIndex + 1;
+            document.getElementById('total-q-num').textContent = total;
+            document.getElementById('article-badge').textContent = q.article ? `Art. ${q.article}` : 'General';
+            document.getElementById('q-type-badge').textContent = q.type.replace('_', ' ');
+            
+            // Progress Bar
+            const progressPct = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+
+            // Render Text
+            document.getElementById('question-text').textContent = q.question;
+
+            // Render Options
+            const container = document.getElementById('options-container');
+            container.innerHTML = ''; // Clear prev
+
+            userSelectedAnswer = null; // Reset selection
+
+            if (q.type === 'identification') {
+                // Render Input Field
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'mb-3';
+                inputGroup.innerHTML = `
+                    <input type="text" class="form-control form-control-lg" id="ident-answer" placeholder="Type your answer here..." autocomplete="off">
+                    <div class="form-text">Case insensitive.</div>
+                `;
+                container.appendChild(inputGroup);
+                
+                // Listen for input
+                document.getElementById('ident-answer').addEventListener('input', (e) => {
+                    userSelectedAnswer = e.target.value.trim();
+                });
+
+            } else {
+                // Render Buttons (Multiple Choice / Situational)
+                // Randomize options just in case
+                let options = [...q.options].sort(() => 0.5 - Math.random());
+                
+                options.forEach((opt, index) => {
+                    const id = `opt-${index}`;
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = `
+                        <input type="radio" class="btn-check" name="quiz-options" id="${id}" value="${opt.replace(/"/g, '&quot;')}">
+                        <label class="btn btn-option w-100 p-3 mb-2 rounded" for="${id}">${opt}</label>
+                    `;
+                    container.appendChild(wrapper);
+                });
+
+                // Listener for radio selection
+                container.addEventListener('change', (e) => {
+                    if (e.target.name === 'quiz-options') {
+                        userSelectedAnswer = e.target.value;
+                    }
+                });
+            }
+        }
+
+        function nextQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+
+            // 1. Validation: Did user answer?
+            if (!userSelectedAnswer) {
+                alert("Please select or type an answer.");
+                return;
+            }
+
+            // 2. Check Answer
+            let isCorrect = false;
+            
+            if (q.type === 'identification') {
+                // Loose string matching
+                if (userSelectedAnswer.toLowerCase() === q.answer.toLowerCase()) {
+                    isCorrect = true;
+                }
+            } else {
+                if (userSelectedAnswer === q.answer) {
+                    isCorrect = true;
+                }
+            }
+
+            if (isCorrect) score++;
+
+            // 3. Move Next or Finish
+            currentQuestionIndex++;
+            if (currentQuestionIndex < activeQuestions.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+
+            const total = activeQuestions.length;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-total').textContent = total;
+
+            const percentage = (score / total) * 100;
+            const msgEl = document.getElementById('score-message');
+
+            if (percentage >= 90) {
+                msgEl.textContent = "Outstanding! You are ready for the exam.";
+                msgEl.className = "alert alert-success border";
+            } else if (percentage >= 75) {
+                msgEl.textContent = "Great job! Just a few more reviews.";
+                msgEl.className = "alert alert-info border";
+            } else {
+                msgEl.textContent = "Keep studying! Review the articles and try again.";
+                msgEl.className = "alert alert-warning border";
+            }
+        }
+
+        function quitQuiz() {
+            if(confirm("Are you sure you want to quit? Progress will be lost.")) {
+                resetApp();
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('setup-section').classList.remove('hidden');
+            document.getElementById('quiz-config-form').reset();
+        }
+
+        // --- 4. INIT: Load JSON data from file if needed ---
+        // In a real scenario, you might fetch('questions.json') here.
+        // For this single file, we rely on the `quizData` const above.
+        
+        // IMPORTANT: PASTE YOUR GENERATED JSON ARRAY INTO THE `quizData` VARIABLE ABOVE.
+
+    </script>
+</body>
+</html>
